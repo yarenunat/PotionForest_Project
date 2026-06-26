@@ -16,6 +16,10 @@ namespace PotionForest.Gameplay
         public PotionSystem potionSystem;
 
         [Header("Visual & Effects")]
+        [Tooltip("The actual pot visual that bounces.")]
+        public Transform cauldronVisual;
+        
+        [Tooltip("The potion that pops up.")]
         public Transform potionVisualTransform;
         
         [Tooltip("The Particle System attached to the cauldron for stardust effects.")]
@@ -94,7 +98,33 @@ namespace PotionForest.Gameplay
                 }
 
                 StartCoroutine(PopAnimation());
+                
+                if (cauldronVisual != null)
+                {
+                    StartCoroutine(CauldronBounceAnimation());
+                }
             }
+        }
+
+        private IEnumerator CauldronBounceAnimation()
+        {
+            float elapsed = 0f;
+            float duration = 0.4f;
+            Vector3 startScale = cauldronVisual.localScale;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                
+                // Squish and squash efektini yaratmak için sinüs dalgası
+                float bounce = Mathf.Sin(t * Mathf.PI) * 0.15f; 
+                cauldronVisual.localScale = startScale + new Vector3(bounce, -bounce, 0f); 
+                
+                yield return null;
+            }
+            
+            cauldronVisual.localScale = startScale;
         }
 
         private IEnumerator PopAnimation()

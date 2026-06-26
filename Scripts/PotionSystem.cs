@@ -65,6 +65,12 @@ namespace PotionForest.Core
             isBrewing = false;
             OnBrewingCompleted?.Invoke(potionData);
             
+            // Add to collection
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.UnlockPotion(potionData.potionName);
+            }
+            
             Debug.Log($"Finished brewing {potionData.potionName}!");
         }
 

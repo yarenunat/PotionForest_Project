@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace PotionForest.Core
 {
@@ -21,6 +22,10 @@ namespace PotionForest.Core
         
         [Tooltip("Curve for time scale fading to ensure the transition is soft and not abrupt.")]
         public AnimationCurve timeScaleFadeCurve = AnimationCurve.EaseInOut(0f, 0f, 1f, 1f);
+
+        [Header("Collection")]
+        [Tooltip("List of unlocked potion names.")]
+        public List<string> unlockedPotions = new List<string>();
 
         private Coroutine timeFadeRoutine;
 
@@ -46,6 +51,15 @@ namespace PotionForest.Core
         public void AddCoins(int amount)
         {
             coinCount += amount;
+        }
+
+        public void UnlockPotion(string potionName)
+        {
+            if (!unlockedPotions.Contains(potionName))
+            {
+                unlockedPotions.Add(potionName);
+                // Optionally trigger an event to notify CollectionMenu instantly
+            }
         }
 
         /// <summary>

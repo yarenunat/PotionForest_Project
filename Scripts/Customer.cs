@@ -35,6 +35,12 @@ namespace PotionForest.Gameplay
 
         private void DeliverPotion()
         {
+            if (GameManager.Instance == null)
+            {
+                Debug.LogError("[Customer] GameManager.Instance null! Para eklenemedi.");
+                return;
+            }
+
             // Oyuncuya para kazandır
             GameManager.Instance.AddCoins(rewardGold);
             

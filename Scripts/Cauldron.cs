@@ -25,9 +25,37 @@ namespace PotionForest.Gameplay
         [Tooltip("The Particle System attached to the cauldron for stardust effects.")]
         public ParticleSystem starDustParticles; 
 
+        private bool isInitialized = false;
+
+        private void Start()
+        {
+            CheckDependencies();
+        }
+
+        private void CheckDependencies()
+        {
+            // 1. Lazy Initialization (Eğer unutulmuşsa kod kendisi bulsun)
+            if (potionSystem == null)
+            {
+                potionSystem = FindObjectOfType<PotionSystem>();
+                if (potionSystem == null)
+                {
+                    Debug.LogError("[Cauldron] PotionSystem sahnede bulunamadı! Lütfen ekleyin.");
+                    enabled = false;
+                    return;
+                }
+            }
+
+            // 2. Event Abonelikleri (OnEnable yerine güvenli başlatma sonrası)
+            potionSystem.OnBrewingStarted += HandleBrewingStarted;
+            potionSystem.OnBrewingCompleted += HandleBrewingCompleted;
+
+            isInitialized = true;
+        }
+
         private void OnEnable()
         {
-            if (potionSystem != null)
+            if (isInitialized && potionSystem != null)
             {
                 potionSystem.OnBrewingStarted += HandleBrewingStarted;
                 potionSystem.OnBrewingCompleted += HandleBrewingCompleted;
@@ -45,7 +73,14 @@ namespace PotionForest.Gameplay
 
         private void OnMouseDown()
         {
-            if (targetPotion == null || potionSystem == null) return;
+            if (!isInitialized || targetPotion == null || potionSystem == null) return;
+
+            // Güvenli Singleton Kontrolü (Guard Clause)
+            if (InventoryManager.Instance == null)
+            {
+                Debug.LogError("[Cauldron] InventoryManager.Instance null! İşlem iptal edildi.");
+                return;
+            }
 
             if (InventoryManager.Instance.HasIngredient("glowing_mushroom", 1))
             {

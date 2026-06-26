@@ -19,7 +19,9 @@ namespace PotionForest.Gameplay
         private Quaternion startRotation;
         private Vector3 startPosition;
 
-        private void Start()
+        private Coroutine idleRoutine;
+
+        private void OnEnable()
         {
             startScale = transform.localScale;
             startRotation = transform.localRotation;
@@ -27,7 +29,16 @@ namespace PotionForest.Gameplay
             
             if (enableIdleAnimations)
             {
-                StartCoroutine(IdleRoutine());
+                idleRoutine = StartCoroutine(IdleRoutine());
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (idleRoutine != null)
+            {
+                StopCoroutine(idleRoutine);
+                idleRoutine = null;
             }
         }
 
@@ -35,6 +46,8 @@ namespace PotionForest.Gameplay
         {
             while (true)
             {
+                if (!gameObject.activeInHierarchy) yield break; // Safety check
+
                 // Rastgele bir süre bekle
                 yield return new WaitForSeconds(Random.Range(minWaitTime, maxWaitTime));
                 
